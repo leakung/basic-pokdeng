@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Scanner;
 
 public class PokDeng {
     private class Card {
@@ -33,13 +34,9 @@ public class PokDeng {
     ArrayList<Card> deck;
     ArrayList<Card> dealerHand;
     int dealerSum;
-    HashSet<Integer> dealerValue;
-    HashSet<String> dealerType;
     boolean dealerDeng;
     ArrayList<Card> playerHand;
     int playerSum;
-    HashSet<Integer> playerValue;
-    HashSet<String> playerType;
     boolean playerDeng;
     String result;
 
@@ -54,24 +51,42 @@ public class PokDeng {
 
         dealerHand = new ArrayList<Card>();
         dealerSum = 0;
-        dealerValue = new HashSet<Integer>();
-        dealerType = new HashSet<String>();
         dealerDeng = false;
         playerHand = new ArrayList<Card>();
         playerSum = 0;
-        playerValue = new HashSet<Integer>();
-        playerType = new HashSet<String>();
         playerDeng = false;
         result = "";
 
         // play
         dealCard();
+
+        System.out.print("\nPLAYER : ");
+        System.out.println(playerHand);
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Press H for Hit or S for Stay");
+        while (sc.hasNextLine()) {
+            String input = sc.nextLine();
+            if ((input.equals("H")) || (input.equals("h"))) {
+                callCard();
+                break;
+            } else if ((input.equals("S")) || (input.equals("s"))) {
+                break;
+            }
+            System.out.println("Press H for Hit or S for Stay");
+        }
+
         // cal
         calCard();
+
         // compare
         compareCard();
 
-        System.out.println("RESULT");
+        System.out.print("\nDEALER : ");
+        System.out.println(dealerHand);
+        System.out.print("PLAYER : ");
+        System.out.println(playerHand);
+        System.out.print("\nRESULT : ");
         System.out.println(result);
     }
 
@@ -106,13 +121,14 @@ public class PokDeng {
             card = deck.remove(deck.size() - 1);
             dealerHand.add(card);
         }
-        System.out.println("DEALER:");
-        System.out.println(dealerHand);
-        System.out.println("PLAYER:");
-        System.out.println(playerHand);
     }
 
     public void calCard() {
+        HashSet<Integer> dealerValue = new HashSet<Integer>();
+        HashSet<String> dealerType = new HashSet<String>();
+        HashSet<Integer> playerValue = new HashSet<Integer>();
+        HashSet<String> playerType = new HashSet<String>();
+
         for (int i = 0; i < dealerHand.size(); i++) {
             dealerSum += dealerHand.get(i).getValue();
             dealerValue.add(dealerHand.get(i).getValue());
@@ -135,16 +151,20 @@ public class PokDeng {
         if ((dealerSum % 10) > (playerSum % 10)) {
             result = "Dealer win";
             if (dealerDeng) {
-                result += " with deng";
+                result += " with " + dealerHand.size() + " deng";
             }
         } else if ((dealerSum % 10) < (playerSum % 10)) {
             result = "Player win";
             if (playerDeng) {
-                result += " with deng";
+                result += " with " + playerHand.size() + " deng";
             }
         } else {
             result = "Tie";
         }
+    }
 
+    public void callCard() {
+        Card card = deck.remove(deck.size() - 1);
+        playerHand.add(card);
     }
 }
