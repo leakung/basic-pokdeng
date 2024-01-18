@@ -64,16 +64,15 @@ public class PokDeng {
         System.out.println(playerHand);
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Press H for Hit or S for Stay");
+        System.out.println("Press C for Call card or enter for Stay");
         while (sc.hasNextLine()) {
             String input = sc.nextLine();
-            if ((input.equals("H")) || (input.equals("h"))) {
+            if ((input.equals("C")) || (input.equals("c"))) {
                 callCard();
                 break;
-            } else if ((input.equals("S")) || (input.equals("s"))) {
+            } else {
                 break;
             }
-            System.out.println("Press H for Hit or S for Stay");
         }
 
         // cal
