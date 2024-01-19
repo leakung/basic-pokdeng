@@ -5,18 +5,18 @@ public class PokDeng {
     private void showCard(Person dealer, Person player, int bet) {
         String resultText = "";
         int times = 1;
-        if ((dealer.hand.sum % 10) > (player.hand.sum % 10)) {
+        if ((dealer.hand.getSum() % 10) > (player.hand.getSum() % 10)) {
             resultText = "Dealer win";
-            if (dealer.hand.deng) {
-                resultText += " with " + dealer.hand.amount + " deng";
-                times = dealer.hand.amount;
+            if (dealer.hand.getDeng()) {
+                resultText += " with " + dealer.hand.getCardAmount() + " deng";
+                times = dealer.hand.getCardAmount();
             }
             pay(dealer, player, bet, times);
-        } else if ((dealer.hand.sum % 10) < (player.hand.sum % 10)) {
+        } else if ((dealer.hand.getSum() % 10) < (player.hand.getSum() % 10)) {
             resultText = "Player win";
-            if (player.hand.deng) {
-                resultText += " with " + player.hand.amount + " deng";
-                times = player.hand.amount;
+            if (player.hand.getDeng()) {
+                resultText += " with " + player.hand.getCardAmount() + " deng";
+                times = player.hand.getCardAmount();
             }
             pay(player, dealer, bet, times);
         } else {
@@ -32,7 +32,6 @@ public class PokDeng {
     }
 
     public void startGame() {
-
         Scanner sc = new Scanner(System.in);
         String input;
         Deck deck;
@@ -50,7 +49,6 @@ public class PokDeng {
         System.out.println(player.pocket.getcoin());
 
         do {
-
             if (dealer.pocket.getcoin() < bet) {
                 System.out.println("Dealer bankrupt");
                 break;
@@ -71,21 +69,21 @@ public class PokDeng {
             }
 
             System.out.print("\nPlayer card : ");
-            System.out.println(player.hand.cardList);
+            System.out.println(player.hand.getCardList());
             System.out.println("Press C for Call card or enter for Stay");
             input = sc.nextLine();
             if ((input.equals("C")) || (input.equals("c"))) {
                 player.hand.addCard(deck.callCard());
             }
 
-            if (dealer.hand.sum % 10 < 6) {
+            if (dealer.hand.getSum() % 10 < 6) {
                 dealer.hand.addCard(deck.callCard());
             }
 
             System.out.print("Dealer card : ");
-            System.out.println(dealer.hand.cardList);
+            System.out.println(dealer.hand.getCardList());
             System.out.print("Player card : ");
-            System.out.println(player.hand.cardList);
+            System.out.println(player.hand.getCardList());
             showCard(dealer, player, bet);
             System.out.print("Dealer coin : ");
             System.out.println(dealer.pocket.getcoin());
@@ -100,5 +98,4 @@ public class PokDeng {
         } while (true);
         sc.close();
     }
-
 }

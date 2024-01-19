@@ -1,6 +1,6 @@
 public class Card {
-    String rank;
-    String suit;
+    private String rank;
+    private String suit;
 
     Card(String rank, String suit) {
         this.rank = rank;
