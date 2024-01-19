@@ -108,53 +108,135 @@ public class PokDeng {
         }
     }
 
-    private String compareCard(Hand dealer, Hand player) {
+    public class Pocket {
+        private int coin;
+
+        Pocket() {
+            coin = 0;
+        }
+
+        public void deposit(int coin) {
+            this.coin += coin;
+        }
+
+        public void withdraw(int coin) {
+            this.coin -= coin;
+        }
+
+        public int getcoin() {
+            return this.coin;
+        }
+    }
+
+    public class Person {
+        Pocket pocket;
+        Hand hand;
+
+        Person() {
+            pocket = new Pocket();
+            hand = new Hand();
+        }
+    }
+
+    private String compareCard(Person dealer, Person player, int bet) {
         String result = "";
-        if ((dealer.sum % 10) > (player.sum % 10)) {
+        if ((dealer.hand.sum % 10) > (player.hand.sum % 10)) {
             result = "Dealer win";
-            if (dealer.deng) {
-                result += " with " + dealer.amount + " deng";
+            if (dealer.hand.deng) {
+                result += " with " + dealer.hand.amount + " deng";
             }
-        } else if ((dealer.sum % 10) < (player.sum % 10)) {
+            pay(dealer, player, bet);
+        } else if ((dealer.hand.sum % 10) < (player.hand.sum % 10)) {
             result = "Player win";
-            if (player.deng) {
-                result += " with " + player.amount + " deng";
+            if (player.hand.deng) {
+                result += " with " + player.hand.amount + " deng";
             }
+            pay(player, dealer, bet);
         } else {
             result = "Tie";
         }
         return result;
     }
 
+    private void pay(Person winner, Person loser, int bet) {
+        int payAmount;
+        if (winner.hand.deng) {
+            payAmount = bet * winner.hand.amount;
+        } else {
+            payAmount = bet;
+        }
+        loser.pocket.withdraw(payAmount);
+        winner.pocket.deposit(payAmount);
+    }
+
     public void startGame() {
 
-        Deck deck = new Deck();
-        deck.shuffle();
-
-        Hand dealerHand = new Hand();
-        Hand playerHand = new Hand();
-
-        for (int i = 0; i < 2; i++) {
-            playerHand.addCard(deck.callCard());
-            dealerHand.addCard(deck.callCard());
-        }
-
-        System.out.println(playerHand.hand);
-
         Scanner sc = new Scanner(System.in);
-        System.out.println("Press C for Call card or enter for Stay");
-        String input = sc.nextLine();
-        if ((input.equals("C")) || (input.equals("c"))) {
-            playerHand.addCard(deck.callCard());
-        }
+        String input;
+        Deck deck;
+        int bet = 10;
+        int coin = 100;
+        Person dealer = new Person();
+        Person player = new Person();
 
-        if (dealerHand.sum % 10 < 6) {
-            dealerHand.addCard(deck.callCard());
-        }
-        
-        System.out.println(dealerHand.hand);
-        System.out.println(playerHand.hand);
-        System.out.println(compareCard(dealerHand, playerHand));
+        dealer.pocket.deposit(coin);
+        player.pocket.deposit(coin);
+
+        System.out.print("Dealer coin : ");
+        System.out.println(dealer.pocket.coin);
+        System.out.print("Player coin : ");
+        System.out.println(player.pocket.coin);
+
+        do {
+
+            if (dealer.pocket.coin <= 0) {
+                System.out.println("Dealer bankrupt");
+                break;
+            }
+            if (player.pocket.coin <= 0) {
+                System.out.println("Player bankrupt");
+                break;
+            }
+
+            deck = new Deck();
+            deck.shuffle();
+            dealer.hand = new Hand();
+            player.hand = new Hand();
+
+            for (int i = 0; i < 2; i++) {
+                player.hand.addCard(deck.callCard());
+                dealer.hand.addCard(deck.callCard());
+            }
+
+            System.out.print("\nPlayer card : ");
+            System.out.println(player.hand.hand);
+            System.out.println("Press C for Call card or enter for Stay");
+            input = sc.nextLine();
+            if ((input.equals("C")) || (input.equals("c"))) {
+                player.hand.addCard(deck.callCard());
+            }
+
+            if (dealer.hand.sum % 10 < 6) {
+                dealer.hand.addCard(deck.callCard());
+            }
+
+            System.out.print("Dealer card : ");
+            System.out.println(dealer.hand.hand);
+            System.out.print("Player card : ");
+            System.out.println(player.hand.hand);
+            System.out.println(compareCard(dealer, player, bet));
+            System.out.print("Dealer coin : ");
+            System.out.println(dealer.pocket.coin);
+            System.out.print("Player coin : ");
+            System.out.println(player.pocket.coin);
+            System.out.println("\nPress enter for play again or E for Exit");
+
+            input = sc.nextLine();
+            if ((input.equals("E")) || (input.equals("e"))) {
+                break;
+            }
+        } while (true);
+        sc.close();
     }
 
 }
