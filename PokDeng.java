@@ -1,170 +1,32 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
 import java.util.Scanner;
 
 public class PokDeng {
-    private class Card {
-        String rank;
-        String suit;
 
-        Card(String rank, String suit) {
-            this.rank = rank;
-            this.suit = suit;
-        }
-
-        public String toString() {
-            return rank + "-" + suit;
-        }
-
-        public int getValue() {
-            if ("JQK".contains(rank)) {
-                return 10;
-            } else if ("A".equals(rank)) {
-                return 1;
-            }
-            return Integer.parseInt(rank);
-        }
-
-        public String getRank() {
-            return rank;
-        }
-
-        public String getSuit() {
-            return suit;
-        }
-    }
-
-    private class Deck {
-        ArrayList<Card> deck;
-        Card card;
-
-        Deck() {
-            deck = new ArrayList<Card>();
-            build();
-        }
-
-        private void build() {
-            String[] ranks = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-            String[] suits = { "C", "D", "H", "S" };
-            for (int j = 0; j < suits.length; j++) {
-                for (int i = 0; i < ranks.length; i++) {
-                    card = new Card(ranks[i], suits[j]);
-                    deck.add(card);
-                }
-            }
-        }
-
-        public void shuffle() {
-            for (int i = 0; i < deck.size(); i++) {
-                Random random = new Random();
-                int j = random.nextInt(deck.size());
-                Card curCard = deck.get(i);
-                Card ranCard = deck.get(j);
-                deck.set(i, ranCard);
-                deck.set(j, curCard);
-            }
-        }
-
-        public Card callCard() {
-            card = this.deck.remove(deck.size() - 1);
-            return card;
-        }
-
-    }
-
-    private class Hand {
-        ArrayList<Card> hand;
-        int sum;
-        boolean deng;
-        int amount;
-        HashSet<String> rank;
-        HashSet<String> suit;
-
-        Hand() {
-            hand = new ArrayList<Card>();
-            sum = 0;
-            deng = false;
-            amount = 0;
-            rank = new HashSet<String>();
-            suit = new HashSet<String>();
-        }
-
-        public void addCard(Card card) {
-            hand.add(card);
-            amount += 1;
-            sum += card.getValue();
-            rank.add(card.getRank());
-            suit.add(card.getSuit());
-            calDeng();
-        }
-
-        private void calDeng() {
-            if ((rank.size() == 1) || (suit.size() == 1)) {
-                deng = true;
-            } else {
-                deng = false;
-            }
-        }
-    }
-
-    public class Pocket {
-        private int coin;
-
-        Pocket() {
-            coin = 0;
-        }
-
-        public void deposit(int coin) {
-            this.coin += coin;
-        }
-
-        public void withdraw(int coin) {
-            this.coin -= coin;
-        }
-
-        public int getcoin() {
-            return this.coin;
-        }
-    }
-
-    public class Person {
-        Pocket pocket;
-        Hand hand;
-
-        Person() {
-            pocket = new Pocket();
-            hand = new Hand();
-        }
-    }
-
-    private String compareCard(Person dealer, Person player, int bet) {
-        String result = "";
+    private void showCard(Person dealer, Person player, int bet) {
+        String resultText = "";
+        int times = 1;
         if ((dealer.hand.sum % 10) > (player.hand.sum % 10)) {
-            result = "Dealer win";
+            resultText = "Dealer win";
             if (dealer.hand.deng) {
-                result += " with " + dealer.hand.amount + " deng";
+                resultText += " with " + dealer.hand.amount + " deng";
+                times = dealer.hand.amount;
             }
-            pay(dealer, player, bet);
+            pay(dealer, player, bet, times);
         } else if ((dealer.hand.sum % 10) < (player.hand.sum % 10)) {
-            result = "Player win";
+            resultText = "Player win";
             if (player.hand.deng) {
-                result += " with " + player.hand.amount + " deng";
+                resultText += " with " + player.hand.amount + " deng";
+                times = player.hand.amount;
             }
-            pay(player, dealer, bet);
+            pay(player, dealer, bet, times);
         } else {
-            result = "Tie";
+            resultText = "Tie";
         }
-        return result;
+        System.out.println(resultText);
     }
 
-    private void pay(Person winner, Person loser, int bet) {
-        int payAmount;
-        if (winner.hand.deng) {
-            payAmount = bet * winner.hand.amount;
-        } else {
-            payAmount = bet;
-        }
+    private void pay(Person winner, Person loser, int bet, int times) {
+        int payAmount = bet * times;
         loser.pocket.withdraw(payAmount);
         winner.pocket.deposit(payAmount);
     }
@@ -183,17 +45,17 @@ public class PokDeng {
         player.pocket.deposit(coin);
 
         System.out.print("Dealer coin : ");
-        System.out.println(dealer.pocket.coin);
+        System.out.println(dealer.pocket.getcoin());
         System.out.print("Player coin : ");
-        System.out.println(player.pocket.coin);
+        System.out.println(player.pocket.getcoin());
 
         do {
 
-            if (dealer.pocket.coin <= 0) {
+            if (dealer.pocket.getcoin() < bet) {
                 System.out.println("Dealer bankrupt");
                 break;
             }
-            if (player.pocket.coin <= 0) {
+            if (player.pocket.getcoin() < bet) {
                 System.out.println("Player bankrupt");
                 break;
             }
@@ -209,7 +71,7 @@ public class PokDeng {
             }
 
             System.out.print("\nPlayer card : ");
-            System.out.println(player.hand.hand);
+            System.out.println(player.hand.cardList);
             System.out.println("Press C for Call card or enter for Stay");
             input = sc.nextLine();
             if ((input.equals("C")) || (input.equals("c"))) {
@@ -221,14 +83,14 @@ public class PokDeng {
             }
 
             System.out.print("Dealer card : ");
-            System.out.println(dealer.hand.hand);
+            System.out.println(dealer.hand.cardList);
             System.out.print("Player card : ");
-            System.out.println(player.hand.hand);
-            System.out.println(compareCard(dealer, player, bet));
+            System.out.println(player.hand.cardList);
+            showCard(dealer, player, bet);
             System.out.print("Dealer coin : ");
-            System.out.println(dealer.pocket.coin);
+            System.out.println(dealer.pocket.getcoin());
             System.out.print("Player coin : ");
-            System.out.println(player.pocket.coin);
+            System.out.println(player.pocket.getcoin());
             System.out.println("\nPress enter for play again or E for Exit");
 
             input = sc.nextLine();
