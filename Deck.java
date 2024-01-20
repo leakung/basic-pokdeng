@@ -2,8 +2,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Deck {
-    ArrayList<Card> deck;
-    Card card;
+    private ArrayList<Card> deck;
+    private Card card;
 
     Deck() {
         deck = new ArrayList<Card>();
